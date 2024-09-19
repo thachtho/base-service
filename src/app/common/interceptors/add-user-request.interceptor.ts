@@ -5,12 +5,15 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { ClsServiceManager } from 'nestjs-cls';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
-    return next.handle().pipe(tap(() => console.error(request)));
+    const user = JSON.parse(request.headers['user']);
+    ClsServiceManager.getClsService().set('userId', user.id);
+
+    return next.handle();
   }
 }
